@@ -148,12 +148,13 @@ const fromPathWithAlias = (resolve, projectRoot, workspaces, filePath) => {
     }
 
     if (isAbsolutePath(filePath)) {
-        return filePath;
+        return resolve(filePath);
     }
 
     if (isWorkspacePath(filePath)) {
         const ws = pathWorkspaceInfo(filePath);
-        return pathFromWorkspace(workspaces, ws.name, ws.path);
+        const p = pathFromWorkspace(workspaces, ws.name, ws.path);
+        return resolve(p);
     }
 
     if (isNodeModule(filePath)) {

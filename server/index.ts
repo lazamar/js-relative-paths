@@ -1,4 +1,7 @@
-import express from "express";
+import * as workspace from "../workspace";
+workspace.register();
+
+import * as express from "express";
 import home from "@server/routes/home"
 import notFound from "@server/routes/not-found"
 

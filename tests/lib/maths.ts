@@ -1,5 +1,5 @@
 import * as test from "tape" // Absolute import. The same everywhere
-import * as maths from "@src/lib/maths.ts" // Absolute import. The same everywhere
+import * as maths from "@src/lib/maths" // Absolute import. The same everywhere
 
 test("Maths", (t) => {
 	t.plan(4);
