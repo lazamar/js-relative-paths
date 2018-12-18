@@ -4,5 +4,14 @@
   "description": "Demonstration of a project using relative paths",
   "main": "index.js",
   "author": "Marcelo Lazaroni <lazaronijunior@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "browserify": "^16.2.3",
+    "eslint": "^5.10.0",
+    "eslint-plugin-typescript": "^0.14.0",
+    "gulp": "^4.0.0",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.2",
+    "typescript-eslint-parser": "^21.0.2"
+  }
 }

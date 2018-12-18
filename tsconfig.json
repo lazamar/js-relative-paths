@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "*": ["node_modules/*"],
+            "@root/*": ["./*"],
+            "@src/*": ["src/*"],
+            "@tests/*": ["tests/*"],
+            "@build/*": ["build/*"],
+            "@server/*": ["server/*"]
+        }
+    },
+    "include": ["src/**/*", "server/**/*"],
+    "exclude": ["node_modules"]
+}
