@@ -11,6 +11,6 @@
             "@server/*": ["server/*"]
         }
     },
-    "include": ["src/**/*", "server/**/*"],
+    "include": ["src/**/*", "server/**/*", "tests/**/*"],
     "exclude": ["node_modules"]
 }
