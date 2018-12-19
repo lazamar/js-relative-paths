@@ -8,7 +8,8 @@
             "@browser/*": ["browser/*"],
             "@tests/*": ["tests/*"],
             "@build/*": ["build/*"],
-            "@server/*": ["server/*"]
+            "@server/*": ["server/*"],
+            "@styles/*": ["styles/*"]
         }
     },
     "include": ["src/**/*", "server/**/*", "tests/**/*"],
