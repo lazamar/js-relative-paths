@@ -21,6 +21,7 @@
     "tape": "^4.9.1",
     "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.7.0",
+    "tsify": "^4.0.1",
     "typescript": "^3.2.2",
     "typescript-eslint-parser": "^21.0.2"
   }
