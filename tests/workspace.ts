@@ -8,7 +8,7 @@ const path = require("path");
 const realPathRoot = path.resolve(__dirname, "./..");
 
 test("Workspace", t => {
-    t.plan(20);
+    t.plan(21);
 
     t.equal(workspace.projectRoot, realPathRoot, "Sets the correct project root");
 
@@ -153,5 +153,43 @@ test("Workspace", t => {
             finalPath2,
             'Adds "/index" at the end if the path is equal to the workspace name'
         );
+    });
+
+    t.test("register()", st => {
+        st.plan(4);
+
+        st.throws(() => {
+            workspace.register();
+            workspace.unregister();
+            require.resolve("@build");
+        }, '"unregister()" makes require() go back to normal');
+
+        const withRegistered = f => {
+            workspace.register();
+            f();
+            workspace.unregister();
+        };
+
+        withRegistered(() => {
+            /* eslint-disable global-require */
+            st.equal(
+                workspace.require("@root/package.json"),
+                require("@root/package.json"),
+                "require() returns the same as workspace.require for aliased paths"
+            );
+
+            st.equal(
+                workspace.require("fs"),
+                require("fs"),
+                "require() returns the same as workspace.require for native modules"
+            );
+
+            st.equal(
+                workspace.require("tape"),
+                require("tape"),
+                "require() returns the same as workspace.require for installed modules"
+            );
+            /* eslint-disable global-require */
+        });
     });
 });

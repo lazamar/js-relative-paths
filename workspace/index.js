@@ -141,7 +141,7 @@ const isNodeModule = p => /^[a-zA-Z]/.test(p);
 const fromPathWithAlias = (resolve, projectRoot, workspaces, filePath) => {
     if (isRelativePath(filePath)) {
         throw new Error(
-            "Relative paths are not allowed. Please use workspace paths or paths from root"
+            `Relative paths are not allowed. Please change "${filePath}" for a path using workspace paths or paths from root`
         );
     }
 
@@ -199,6 +199,31 @@ const toPathWithAlias = (projectRoot, workspaces, pathOfSourceFile, filePath) =>
 
 // -----------------------------------------------------------------------------
 
+const Module = require("module");
+// original function for require.resolve
+const originalResolve = Module._resolveFilename;
+
+const isInNodeModules = parent => parent && parent.id && parent.id.includes("node_modules");
+
+// Replace node's require.resolve with our workspacePath function
+const register = (projectRoot, workspaces) => {
+    Module._resolveFilename = function(pathWithAlias, parent, isMain, options) {
+        const resolve = filePath => originalResolve(filePath, parent, isMain, options);
+
+        const pathToResolve =
+            isInNodeModules(parent)
+                ? pathWithAlias
+                : fromPathWithAlias(resolve, projectRoot, workspaces, pathWithAlias)
+                
+        return resolve(pathToResolve );
+    };
+};
+
+// Make return calls go back to normal
+const unregister = () => {
+    Module._resolveFilename = originalResolve;
+};
+
 /* eslint-disable complexity */
 module.exports = (function() {
     /* eslint-enable complexity */
@@ -248,6 +273,8 @@ module.exports = (function() {
         require: pathWithAlias => require(resolve(pathWithAlias)),
         toPathWithAlias: (pathOfSourceFile, filePath) =>
             toPathWithAlias(projectRoot, workspaces, pathOfSourceFile, filePath),
+        register: () => register(projectRoot, workspaces),
+        unregister,
         _parseWorkspaces: parseWorkspaces // exposed for testing only
     };
 })();

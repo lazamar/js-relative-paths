@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "Demonstration of a project using relative paths",
   "main": "index.js",
-  "author": "Marcelo Lazaroni <lazaronijunior@gmail.com>",
+  "author": "Marcelo Lazaroni",
   "license": "MIT",
   "scripts": {
     "test": "ts-node -r tsconfig-paths/register node_modules/.bin/tape tests/index.ts | ./node_modules/.bin/tap-spec",
-    "server": "ts-node -r tsconfig-paths/register server/index.ts"
+    "server": "ts-node -r ./workspace/register server/index.ts"
   },
   "dependencies": {
     "@types/node": "^10.12.18",

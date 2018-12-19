@@ -1,7 +1,7 @@
-const ws = require("../workspace");
-const express = require("express");
-const home = ws.require("@server/routes/home");
-const notFound = ws.require("@server/routes/not-found");
+const ws = require("@root/workspace");
+import * as  express from "express";
+import home from "@server/routes/home";
+import notFound from "@server/routes/not-found";
 
 const app = express()
 const port = 3000
