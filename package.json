@@ -6,9 +6,10 @@
   "author": "Marcelo Lazaroni <lazaronijunior@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "test": "ts-node -r ./workspace/register node_modules/.bin/tape tests/**/* | ./node_modules/.bin/tap-spec"
+    "test": "ts-node -r tsconfig-paths/register node_modules/.bin/tape tests/index.ts | ./node_modules/.bin/tap-spec"
   },
   "dependencies": {
+    "app-root-path": "^2.1.0",
     "browserify": "^16.2.3",
     "eslint": "^5.10.0",
     "eslint-plugin-typescript": "^0.14.0",
@@ -17,6 +18,7 @@
     "tap-spec": "^5.0.0",
     "tape": "^4.9.1",
     "ts-node": "^7.0.1",
+    "tsconfig-paths": "^3.7.0",
     "typescript": "^3.2.2",
     "typescript-eslint-parser": "^21.0.2"
   }

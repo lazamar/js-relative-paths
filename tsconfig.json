@@ -5,7 +5,7 @@
         "paths": {
             "*": ["node_modules/*"],
             "@root/*": ["./*"],
-            "@src/*": ["src/*"],
+            "@browser/*": ["browser/*"],
             "@tests/*": ["tests/*"],
             "@build/*": ["build/*"],
             "@server/*": ["server/*"]

@@ -1,5 +1,5 @@
-import * as maths from "@src/lib/maths"; // local module using absolute path
-import assert from "assert" // importing an npm module
+import * as maths from "@browser/lib/maths"; // local module using absolute path
+import * as assert from "assert" // importing an npm module
 
 // Sample function using our local import and node module import
 export const fibonacci = n => {

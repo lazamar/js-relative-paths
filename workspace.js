@@ -39,9 +39,7 @@ const regexWorkspace = /^@[\w-]+/;
 
 const CONFIG_FILE = "tsconfig";
 const DEFAULT_CONFIG = { workspaces: {} };
-// This module is used to find the location of the node_modules folder and 
-// with that find the project's root.
-const LOCAL_MODULE = "typescript";
+const LOCAL_MODULE = "tape";
 
 const wsRoot = "@root";
 // Do not check for the pre-existence of these workspace directories
@@ -143,18 +141,17 @@ const isNodeModule = p => /^[a-zA-Z]/.test(p);
 const fromPathWithAlias = (resolve, projectRoot, workspaces, filePath) => {
     if (isRelativePath(filePath)) {
         throw new Error(
-            `Relative paths are not allowed. Please replace "${filePath}" with a workspace paths or paths from root`
+            "Relative paths are not allowed. Please use workspace paths or paths from root"
         );
     }
 
     if (isAbsolutePath(filePath)) {
-        return resolve(filePath);
+        return filePath;
     }
 
     if (isWorkspacePath(filePath)) {
         const ws = pathWorkspaceInfo(filePath);
-        const p = pathFromWorkspace(workspaces, ws.name, ws.path);
-        return resolve(p);
+        return pathFromWorkspace(workspaces, ws.name, ws.path);
     }
 
     if (isNodeModule(filePath)) {
@@ -206,18 +203,10 @@ const Module = require("module");
 // original function for require.resolve
 const originalResolve = Module._resolveFilename;
 
-const parentIsNodeModule = parent =>
-    parent && parent.id && parent.id.includes("node_modules");
-
 // Replace node's require.resolve with our workspacePath function
 const register = (projectRoot, workspaces) => {
     Module._resolveFilename = function(pathWithAlias, parent, isMain, options) {
         const resolve = filePath => originalResolve(filePath, parent, isMain, options);
-
-        if (parentIsNodeModule(parent)) {
-            return resolve(pathWithAlias);
-        }
-
         return fromPathWithAlias(resolve, projectRoot, workspaces, pathWithAlias);
     };
 };
@@ -234,7 +223,8 @@ module.exports = (function() {
     // We assume that the node_modules folder is at the
     // root of the project and that this package was installed in
     // the project's local node_modules folder
-    const projectRoot = [require.resolve(LOCAL_MODULE )]
+    // TODO: Change this to __dirname when this goes to npm
+    const projectRoot = [require.resolve(LOCAL_MODULE)]
         .map(v => v.split(path.sep))
         .map(v => v.reverse())
         .map(v => dropUntil("node_modules", v))
