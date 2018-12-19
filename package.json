@@ -6,9 +6,11 @@
   "author": "Marcelo Lazaroni <lazaronijunior@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "test": "ts-node -r tsconfig-paths/register node_modules/.bin/tape tests/index.ts | ./node_modules/.bin/tap-spec"
+    "test": "ts-node -r tsconfig-paths/register node_modules/.bin/tape tests/index.ts | ./node_modules/.bin/tap-spec",
+    "server": "ts-node -r tsconfig-paths/register server/index.ts"
   },
   "dependencies": {
+    "@types/node": "^10.12.18",
     "app-root-path": "^2.1.0",
     "browserify": "^16.2.3",
     "eslint": "^5.10.0",

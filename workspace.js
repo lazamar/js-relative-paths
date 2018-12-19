@@ -199,23 +199,6 @@ const toPathWithAlias = (projectRoot, workspaces, pathOfSourceFile, filePath) =>
 
 // -----------------------------------------------------------------------------
 
-const Module = require("module");
-// original function for require.resolve
-const originalResolve = Module._resolveFilename;
-
-// Replace node's require.resolve with our workspacePath function
-const register = (projectRoot, workspaces) => {
-    Module._resolveFilename = function(pathWithAlias, parent, isMain, options) {
-        const resolve = filePath => originalResolve(filePath, parent, isMain, options);
-        return fromPathWithAlias(resolve, projectRoot, workspaces, pathWithAlias);
-    };
-};
-
-// Make return calls go back to normal
-const unregister = () => {
-    Module._resolveFilename = originalResolve;
-};
-
 /* eslint-disable complexity */
 module.exports = (function() {
     /* eslint-enable complexity */
@@ -265,8 +248,6 @@ module.exports = (function() {
         require: pathWithAlias => require(resolve(pathWithAlias)),
         toPathWithAlias: (pathOfSourceFile, filePath) =>
             toPathWithAlias(projectRoot, workspaces, pathOfSourceFile, filePath),
-        register: () => register(projectRoot, workspaces),
-        unregister,
         _parseWorkspaces: parseWorkspaces // exposed for testing only
     };
 })();
