@@ -3,7 +3,7 @@ const test = require("tape");
 const path = require("path");
 
 /* This file tests the `workspace` module.
-*/
+ */
 
 const realPathRoot = path.resolve(__dirname, "./..");
 
@@ -32,8 +32,7 @@ test("Workspace", t => {
     );
 
     const moduleName = "tape";
-    const modulePath = require.resolve(moduleName);
-    t.equal(workspace.path(moduleName), modulePath, "Returns correct path for node modules");
+    t.equal(workspace.path(moduleName), moduleName, "Does not try to unalias node modules");
 
     const absoluteModulePath = "/home/user/some/path";
     t.equal(
@@ -66,8 +65,10 @@ test("Workspace", t => {
         "Throws if trying to access a path that should be part of a workspace"
     );
 
-    t.throws(
-        () => workspace.path("README.md"),
+    const fileName = "package.json";
+    t.equal(
+        workspace.path(fileName),
+        fileName,
         "If trying to access a path from root without a forward slash at the beginning, interprets it as a node module."
     );
 
@@ -156,7 +157,7 @@ test("Workspace", t => {
     });
 
     t.test("register()", st => {
-        st.plan(4);
+        st.plan(5);
 
         st.throws(() => {
             workspace.register();
@@ -188,6 +189,12 @@ test("Workspace", t => {
                 workspace.require("tape"),
                 require("tape"),
                 "require() returns the same as workspace.require for installed modules"
+            );
+
+            st.equal(
+                workspace.require("@bamblehorse/tiny"),
+                require("@bamblehorse/tiny"),
+                "require() returns the same as workspace.require for scoped node modules"
             );
             /* eslint-disable global-require */
         });

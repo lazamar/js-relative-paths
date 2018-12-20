@@ -50,6 +50,10 @@ const overlapCheckIgnore = [wsRoot];
 const nonOverlapping = workspaces =>
     Object.keys(workspaces).filter(ws => !overlapCheckIgnore.includes(ws));
 
+// ----------------------------------------------------------------------------
+// ---------- PARSING WORKSPACES OBJECT ---------------------------------------
+// ----------------------------------------------------------------------------
+
 const pathExists = p => fs.existsSync(p);
 
 const dropUntil = (value, list) =>
@@ -95,6 +99,11 @@ const parseWorkspaces = (projectRoot, rawWorkspaces) => {
     return workspaces;
 };
 
+// ----------------------------------------------------------------------------
+// ----- TRANSFORMING ALIASED PATHS TO REAL PATHS -----------------------------
+// ----------------------------------------------------------------------------
+
+// Returns an absolute path
 const pathFromWorkspace = (workspaces, space, filePath) => {
     assert(
         workspaces[space],
@@ -134,11 +143,13 @@ const pathWorkspaceInfo = filePathWithAlias => {
 
 const isRelativePath = p => p[0] === ".";
 const isAbsolutePath = p => p[0] === "/";
-const isWorkspacePath = p => p[0] === "@";
-const isNodeModule = p => /^[a-zA-Z]/.test(p);
+const isWorkspacePath = (workspaces, p) =>
+    p[0] === "@" && Object.keys(workspaces).find(ws => p.startsWith(ws));
+const isNodeModule = p => /^[a-z@]/.test(p);
 
-// From path with alias to absolute path
-const fromPathWithAlias = (resolve, projectRoot, workspaces, filePath) => {
+// From path with alias to path without alias
+// Does not resolve paths to node modules
+const unalias = (projectRoot, workspaces, filePath) => {
     if (isRelativePath(filePath)) {
         throw new Error(
             `Relative paths are not allowed. Please change "${filePath}" for a path using workspace paths or paths from root`
@@ -149,26 +160,28 @@ const fromPathWithAlias = (resolve, projectRoot, workspaces, filePath) => {
         return filePath;
     }
 
-    if (isWorkspacePath(filePath)) {
+    if (isWorkspacePath(workspaces, filePath)) {
         const ws = pathWorkspaceInfo(filePath);
         return pathFromWorkspace(workspaces, ws.name, ws.path);
     }
 
     if (isNodeModule(filePath)) {
-        return resolve(filePath);
+        return filePath;
     }
 
     throw new Error(`Unable to recognise path "${filePath}"`);
 };
 
-// ------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----- TRANSFORMING REAL PATHS TO ALIASED PATHS -----------------------------
+// ----------------------------------------------------------------------------
 
 const absolutePath = (projectRoot, workspaces, pathOfSourceFile, filePath) => {
     if (isRelativePath(filePath)) {
         return path.join(path.dirname(pathOfSourceFile), filePath);
     }
 
-    if (isWorkspacePath(filePath)) {
+    if (isWorkspacePath(workspaces, filePath)) {
         const ws = pathWorkspaceInfo(filePath);
         return pathFromWorkspace(workspaces, ws.name, ws.path);
     }
@@ -197,7 +210,9 @@ const toPathWithAlias = (projectRoot, workspaces, pathOfSourceFile, filePath) =>
     return pathWithAlias === workspace ? path.join(pathWithAlias, "index") : pathWithAlias;
 };
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ---------- REPLACING NODE'S DEFAULT REQUIRE --------------------------------
+// ----------------------------------------------------------------------------
 
 const Module = require("module");
 // original function for require.resolve
@@ -208,14 +223,11 @@ const isInNodeModules = parent => parent && parent.id && parent.id.includes("nod
 // Replace node's require.resolve with our workspacePath function
 const register = (projectRoot, workspaces) => {
     Module._resolveFilename = function(pathWithAlias, parent, isMain, options) {
-        const resolve = filePath => originalResolve(filePath, parent, isMain, options);
+        const unaliased = isInNodeModules(parent)
+            ? pathWithAlias
+            : unalias(projectRoot, workspaces, pathWithAlias);
 
-        const pathToResolve =
-            isInNodeModules(parent)
-                ? pathWithAlias
-                : fromPathWithAlias(resolve, projectRoot, workspaces, pathWithAlias)
-                
-        return resolve(pathToResolve );
+        return originalResolve(unaliased, parent, isMain, options);
     };
 };
 
@@ -224,14 +236,13 @@ const unregister = () => {
     Module._resolveFilename = originalResolve;
 };
 
-/* eslint-disable complexity */
+// ----------------------------------------------------------------------------
+
 module.exports = (function() {
-    /* eslint-enable complexity */
     // Path to the root of the project
     // We assume that the node_modules folder is at the
     // root of the project and that this package was installed in
     // the project's local node_modules folder
-    // TODO: Change this to __dirname when this goes to npm
     const projectRoot = [require.resolve(LOCAL_MODULE)]
         .map(v => v.split(path.sep))
         .map(v => v.reverse())
@@ -263,8 +274,7 @@ module.exports = (function() {
         }, {});
 
     const workspaces = parseWorkspaces(projectRoot, stringPaths);
-    const resolve = pathWithAlias =>
-        fromPathWithAlias(require.resolve, projectRoot, workspaces, pathWithAlias);
+    const resolve = pathWithAlias => unalias(projectRoot, workspaces, pathWithAlias);
 
     return {
         projectRoot,

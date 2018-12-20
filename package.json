@@ -10,14 +10,18 @@
     "server": "ts-node -r ./workspace/register server/index.ts"
   },
   "dependencies": {
+    "@bamblehorse/tiny": "^2.0.0",
     "@types/node": "^10.12.18",
     "app-root-path": "^2.1.0",
     "browserify": "^16.2.3",
     "eslint": "^5.10.0",
+    "eslint-config-prettier": "^3.3.0",
+    "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-typescript": "^0.14.0",
     "express": "^4.16.4",
     "gulp": "^4.0.0",
     "gulp-sass": "^4.0.2",
+    "prettier": "^1.15.3",
     "tap-spec": "^5.0.0",
     "tape": "^4.9.1",
     "ts-node": "^7.0.1",
