@@ -3,31 +3,6 @@
 /*
     This module exists so that we never again do this: 
         require("../../../../../file")
-
-    With this module we can do
-        thisModule.require("@workspace", "my/path/to/file")
-
-    All paths are specified in `tsconfig.json`
-
-    Why do we need this module?
-
-        -   We want absolute imports in both Node.js and TypeScript.
-        
-        -   We want things to be as explicit as possible, no environment variables,
-        global node variables or any of those shennanigans. If someone looks at the
-        code they should be able to figure out by themselves what is going on.
-
-        -   We want path configuration in only ONE place. When changing or adding
-        a path we should only go to one place.
-
-        -   We want our IDEs to work! If a path doesn't exist, we should see the IDE error.
-
-        -   Lastly, we want to impose our own rules.
-            -   The paths should never overlap
-            -   Parent imports are forbidden (e.g. "@somewhere/../../another")
-                -   This module enforces this restriction in Node.js
-                -   We use an eslint plugin to make sure this is enforced in the 
-                    typescript codebase.
 */
 
 const path = require("path");

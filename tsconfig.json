@@ -12,6 +12,6 @@
             "@styles/*": ["styles/*"]
         }
     },
-    "include": ["src/**/*", "server/**/*", "tests/**/*"],
+    "include": ["browser/**/*", "server/**/*", "tests/**/*"],
     "exclude": ["node_modules"]
 }
